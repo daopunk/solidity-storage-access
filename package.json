@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-    "devDependencies": {
+  "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.0.4",
     "@nomiclabs/hardhat-waffle": "^2.0.0",

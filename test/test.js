@@ -1,19 +1,28 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { getShortStr, getLongStr } = require("../scripts/readStorage");
 
-describe("Greeter", function () {
-  it("Should return the new greeting once it's changed", async function () {
-    const Greeter = await ethers.getContractFactory("Greeter");
-    const greeter = await Greeter.deploy("Hello, world!");
-    await greeter.deployed();
+// storage slot starting locations
+const shortString = "0x1";
+const longString = "0x2";
 
-    expect(await greeter.greet()).to.equal("Hello, world!");
+describe("StorageEx", function () {
+  let addr;
 
-    const setGreetingTx = await greeter.setGreeting("Hola, mundo!");
-
-    // wait until the transaction is mined
-    await setGreetingTx.wait();
-
-    expect(await greeter.greet()).to.equal("Hola, mundo!");
+  before(async function() {
+    const StorageEx = await ethers.getContractFactory("StorageEx");
+    const contractX = await StorageEx.deploy();
+    await contractX.deployed();
+    addr = contractX.address;
   });
+
+  it("Read short string", async function () {
+    expect(await getShortStr(shortString, addr)).to.equal("hello world");
+  });
+
+  it("Read long string", async function () {
+    expect(await getLongStr(longString, addr)).to.equal("this string is 92 bytes long so it will use three 32 byte storage slots totaling 96 bytes");
+  });
+
+
 });
