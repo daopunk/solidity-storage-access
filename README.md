@@ -1,10 +1,15 @@
-# Basic Sample Hardhat Project
+# Storage Variables with Ethers.js
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project accompanies a tutorial article posted on my Medium blog account: https://medium.com/@cryptoanarchy
 
-Try running some of the following tasks:
+The article explains storage and state on the Ethereum Virtual Machine (EVM) and provides coding examples to access various dynamic variables, such as strings (less than and more than 32-bytes), mappings / nested mappings, arrays / arrays of mappings, and byte-packed variables.
 
+The excercises can be completed with the use of the deployed smart contract on the Rinkeby testnet at address: 0x (not yet deployed!)
+
+
+To get started:
 ```shell
+//generic hardhat commands
 npx hardhat accounts
 npx hardhat compile
 npx hardhat clean
