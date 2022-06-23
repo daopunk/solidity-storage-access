@@ -24,7 +24,6 @@ describe("StorageEx", function () {
   it("Read uint256", async function (){
     expect(await getUint256("0x4", addr)).to.equal(99);
   });
-
   
   it("Read byte-packed values: less than or equal to 6-byte", async function (){
     // 0x0 
