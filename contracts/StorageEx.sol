@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 contract StorageEx {
   enum Vote { Absent, Yes, No }
 
-  // slot 0x0 Big Endian (first byte stored first)
+  // slot 0x0 Big Endian (first byte stored first) --X
   bytes2 a = 0xAce0;
   bytes4 b = 0xBebeAce0;
   bytes4 c = 0xCafeBebe;
@@ -12,7 +12,7 @@ contract StorageEx {
   bytes8 e = 0xEbeeDebeCafeBebe;
   bytes8 f = 0xFebeeAceCafeBebe;
 
-  // slot 0x1
+  // slot 0x1 --X
   bytes16 aa = 0xAAce00Bebe00Cafe00Ace09876543210;
   bytes16 bb = 0xBBebe0Febee00Ace00Cafe0123456789;
 
@@ -26,7 +26,7 @@ contract StorageEx {
   uint256 num = 99;
   
   // slot 0x5
-  // bytes16[] public dynamicArr = [a, b, c, d, e, f, g, h, i];
+  bytes16[] public dynamicArr = [a, b, c, d, e, f, aa, bb];
   
   // slot 0x6
   mapping(address => uint256) public userBalances;
