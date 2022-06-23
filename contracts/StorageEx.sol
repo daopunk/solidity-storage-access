@@ -4,25 +4,29 @@ pragma solidity ^0.8.4;
 contract StorageEx {
   enum Vote { Absent, Yes, No }
 
-  // slot 0x0
-  bytes8 a = "hello";
-  bytes8 b = 0x0000000f0000000f;
-  bytes4 c = 0xAceBabee;
-  bytes3 d = 0xCafe00;
-  bytes3 e = "zzz";
-  bytes2 f = 0x1234;
-  bytes2 g = "hi";
-  bytes1 h = 0xef;
-  bytes1 i = "y";
+  // slot 0x0 Big Endian (first byte stored first)
+  bytes2 a = 0xAce0;
+  bytes4 b = 0xBebeAce0;
+  bytes4 c = 0xCafeBebe;
+  bytes6 d = 0xDebeCafeBebe;
+  bytes8 e = 0xEbeeDebeCafeBebe;
+  bytes8 f = 0xFebeeAceCafeBebe;
 
   // slot 0x1
+  bytes16 aa = 0xAAce00Bebe00Cafe00Ace09876543210;
+  bytes16 bb = 0xBBebe0Febee00Ace00Cafe0123456789;
+
+  // slot 0x2 --X
   string shortStr = "hello world";
 
-  // slot 0x2, 0x3, 0x4 
+  // slot 0x3 (keccak hashed into another location) --X
   string longStr = "this string is 92 bytes long so it will use three 32 byte storage slots totaling 96 bytes";
+
+  // slot 0x4 --X
+  uint256 num = 99;
   
   // slot 0x5
-  bytes16[] public dynamicArr = [a, b, c, d, e, f, g, h, i];
+  // bytes16[] public dynamicArr = [a, b, c, d, e, f, g, h, i];
   
   // slot 0x6
   mapping(address => uint256) public userBalances;
@@ -35,7 +39,7 @@ contract StorageEx {
     mapping(address => Vote) voteState;
   }
 
-  // slot 0x7
+  // slot 0x6
   mapping(uint256 => Proposal) public proposals;
 
   // slot 0x8

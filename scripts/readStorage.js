@@ -1,21 +1,17 @@
 const { ethers } = require('hardhat');
 require('dotenv').config();
+// deployed storage contract
+// const contractAddress = process.env.STORAGE_CONTRACT;
 
 // ethers methods
 const utils = ethers.utils;
 const BigNumber = ethers.BigNumber;
 const MaxUint256 = ethers.constants.MaxUint256
 
-// deployed storage contract
-// const contractAddress = process.env.STORAGE_CONTRACT;
-
 function bytesLength(hexString) {
-  // short string? 
-  if (BigNumber.from(hexString).mask(1).eq(0)) {
-    // if short string decode string length and strip off the upper 31 bytes
-    return BigNumber.from(hexString).shr(1).mask(2).toNumber();
-  }
-  return BigNumber.from(hexString).shr(1).toNumber();
+  // short string? decode string length and strip off the upper 31 bytes
+  if (BigNumber.from(hexString).mask(1).eq(0)) return BigNumber.from(hexString).shr(1).mask(2).toNumber();
+  else return BigNumber.from(hexString).shr(1).toNumber();
 }
 
 async function getShortStr(slot, contractAddress) {
@@ -34,8 +30,8 @@ async function getLongStr(slot, contractAddress) {
   const storageReference = await ethers.provider.getStorageAt(contractAddress, paddedSlot);
 
   const baseSlot = utils.keccak256(paddedSlot);
-  const Slength = bytesLength(storageReference);
-  const totalSlots = Math.ceil(Slength / 32);
+  const sLength = bytesLength(storageReference);
+  const totalSlots = Math.ceil(sLength / 32);
 
   let storageLocation = BigNumber.from(baseSlot).toHexString();
   let str = "";
@@ -48,9 +44,42 @@ async function getLongStr(slot, contractAddress) {
   return str.replace(/\x00/g, '');
 }
 
+async function getUint256(slot, contractAddress) {
+  const paddedSlot = utils.hexZeroPad(slot, 32);
+  const storageLocation = await ethers.provider.getStorageAt(contractAddress, paddedSlot);
+  const storageValue = BigNumber.from(storageLocation);
+  return storageValue;
+}
+
+async function getBytePackedVar(slot, contractAddress, byteShift, byteSize) {
+  // if (byteShift > 32)
+  const paddedSlot = utils.hexZeroPad(slot, 32);
+  const storageLocation = await ethers.provider.getStorageAt(contractAddress, paddedSlot);
+  let result = "";
+  let altByteSize = 0;
+  let altByteShift = 0;
+  let check = false;
+
+  if (byteSize <= 6) {
+    return BigNumber.from(storageLocation).shr(byteShift * 4).mask(byteSize * 4 * 2).toNumber().toString(16);
+  } else {
+    altByteSize = byteSize - 6;
+    altByteShift = byteShift + 12;
+    check = true;
+    result += await getBytePackedVar(slot, contractAddress, altByteShift, altByteSize);
+  }
+
+  if (check) {
+    result += await getBytePackedVar(slot, contractAddress, byteShift, 6);
+  }
+  return result;
+}
+
 module.exports = {
   getShortStr,
-  getLongStr
+  getLongStr,
+  getUint256,
+  getBytePackedVar
 }
 
 
