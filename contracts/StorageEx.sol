@@ -25,10 +25,13 @@ contract StorageEx {
   // slot 0x4 --X
   uint256 num = 99;
   
-  // slot 0x5
-  bytes16[] public dynamicArr = [a, b, c, d, e, f, aa, bb];
-  
+  // slot 0x5 --X
+  bytes8[] public dynamicArr16 = [a, b, c, d, e, f];
+
   // slot 0x6
+  bytes16[] public dynamicArr8 = [a, b, c, d, e, f, aa, bb];
+  
+  // slot 0x7
   mapping(address => uint256) public userBalances;
 
   struct Proposal {
@@ -39,13 +42,13 @@ contract StorageEx {
     mapping(address => Vote) voteState;
   }
 
-  // slot 0x6
+  // slot 0x8
   mapping(uint256 => Proposal) public proposals;
 
-  // slot 0x8
+  // slot 0x9
   address public owner;
 
-  // slot 0x9
+  // slot 0x10
   uint256 public id;
 
   constructor() {

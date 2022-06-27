@@ -75,11 +75,35 @@ async function getBytePackedVar(slot, contractAddress, byteShift, byteSize) {
   return result;
 }
 
+async function getArrayItem(slot, contractAddress, item, byteSize) {
+  const hashedSlot = utils.keccak256(utils.hexZeroPad(slot, 32));
+  const itemsPerSlot = 32 / byteSize;
+  let itemSlot = 0;
+  let itemPos = item;
+  for (let s=1; s<item; s++) {
+    if (item >= itemsPerSlot) {
+      itemPos - itemsPerSlot;
+      itemSlot++;
+    }
+  }
+  
+  let byteShift = (itemPos / itemsPerSlot) * 64;
+  while (byteShift >= 64) {
+    byteShift -= 64;
+  }
+  const hashedSlotByItem = BigNumber.from(hashedSlot).add(Math.floor(item / itemsPerSlot)).toHexString();
+
+  return getBytePackedVar(hashedSlotByItem, contractAddress, byteShift, byteSize);
+}
+
+
+
 module.exports = {
   getShortStr,
   getLongStr,
   getUint256,
-  getBytePackedVar
+  getBytePackedVar,
+  getArrayItem
 }
 
 
