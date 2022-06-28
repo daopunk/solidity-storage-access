@@ -1,7 +1,5 @@
 const { ethers } = require('hardhat');
 require('dotenv').config();
-// deployed storage contract
-// const contractAddress = process.env.STORAGE_CONTRACT;
 
 // ethers methods
 const utils = ethers.utils;
@@ -52,7 +50,6 @@ async function getUint256(slot, contractAddress) {
 }
 
 async function getBytePackedVar(slot, contractAddress, byteShift, byteSize) {
-  // if (byteShift > 32)
   const paddedSlot = utils.hexZeroPad(slot, 32);
   const storageLocation = await ethers.provider.getStorageAt(contractAddress, paddedSlot);
   let result = "";
@@ -78,12 +75,11 @@ async function getBytePackedVar(slot, contractAddress, byteShift, byteSize) {
 async function getArrayItem(slot, contractAddress, item, byteSize) {
   const hashedSlot = utils.keccak256(utils.hexZeroPad(slot, 32));
   const itemsPerSlot = 32 / byteSize;
-  let itemSlot = 0;
   let itemPos = item;
+
   for (let s=1; s<item; s++) {
     if (item >= itemsPerSlot) {
       itemPos - itemsPerSlot;
-      itemSlot++;
     }
   }
   
@@ -96,14 +92,49 @@ async function getArrayItem(slot, contractAddress, item, byteSize) {
   return getBytePackedVar(hashedSlotByItem, contractAddress, byteShift, byteSize);
 }
 
+async function getMappingItem(slot, contractAddress, key) {
+  const paddedSlot = utils.hexZeroPad(slot, 32);
+  const paddedKey = utils.hexZeroPad(key, 32);
+  const itemSlot = utils.keccak256(paddedKey + paddedSlot.slice(2));
+  return await getUint256(itemSlot, contractAddress);
+}
 
+async function getMappingStruct(slot, contractAddress, key, item, type) {
+  const paddedSlot = utils.hexZeroPad(slot, 32);
+  const paddedKey = utils.hexZeroPad(key, 32);
+  const itemSlot1 = utils.keccak256(paddedKey + paddedSlot.slice(2));
+  const itemSlot = BigNumber.from(itemSlot1).add(item).toHexString();
+
+  switch (type) {
+    case "string":
+      return await getShortStr(itemSlot, contractAddress);
+    case "bytes":
+      return getBytePackedVar(itemSlot, contractAddress, 0, 32);
+    case "number":
+      return getUint256(itemSlot, contractAddress);
+  }
+}
+
+async function getNestedMappingStruct(slot, contractAddress, key, item, calldatas) {
+  const paddedSlot = utils.hexZeroPad(slot, 32);
+  const paddedKey = utils.hexZeroPad(key, 32);
+  const itemSlot1 = utils.keccak256(paddedKey + paddedSlot.slice(2));
+  const itemSlot = BigNumber.from(itemSlot1).add(item).toHexString();
+  const paddedCalldatas = utils.hexZeroPad(calldatas, 32);
+  const itemNestedSlot = utils.keccak256(paddedCalldatas + itemSlot.slice(2));
+
+  return getUint256(itemNestedSlot, contractAddress);
+}
 
 module.exports = {
   getShortStr,
   getLongStr,
   getUint256,
   getBytePackedVar,
-  getArrayItem
+  getArrayItem,
+  getMappingItem,
+  getMappingStruct,
+  getNestedMappingStruct
 }
 
 
