@@ -109,13 +109,13 @@ async function getMappingStruct(slot, contractAddress, key, item, type) {
   }
 }
 
-async function getNestedMappingStruct(slot, contractAddress, key, item, calldatas) {
+async function getNestedMappingStruct(slot, contractAddress, key, item, nestedKey) {
   const paddedSlot = utils.hexZeroPad(slot, 32);
   const paddedKey = utils.hexZeroPad(key, 32);
   const itemSlot1 = utils.keccak256(paddedKey + paddedSlot.slice(2));
   const itemSlot = BigNumber.from(itemSlot1).add(item).toHexString();
-  const paddedCalldatas = utils.hexZeroPad(calldatas, 32);
-  const itemNestedSlot = utils.keccak256(paddedCalldatas + itemSlot.slice(2));
+  const paddednestedKey = utils.hexZeroPad(nestedKey, 32);
+  const itemNestedSlot = utils.keccak256(paddednestedKey + itemSlot.slice(2));
 
   return getUint256(itemNestedSlot, contractAddress);
 }
