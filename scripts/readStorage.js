@@ -6,12 +6,6 @@ const utils = ethers.utils;
 const BigNumber = ethers.BigNumber;
 const MaxUint256 = ethers.constants.MaxUint256
 
-function bytesLength(hexString) {
-  // short string? decode string length and strip off the upper 31 bytes
-  if (BigNumber.from(hexString).mask(1).eq(0)) return BigNumber.from(hexString).shr(1).mask(2).toNumber();
-  else return BigNumber.from(hexString).shr(1).toNumber();
-}
-
 async function getShortStr(slot, contractAddress) {
   const paddedSlot = utils.hexZeroPad(slot, 32);
   const storageLocation = await ethers.provider.getStorageAt(contractAddress, paddedSlot);
@@ -28,7 +22,7 @@ async function getLongStr(slot, contractAddress) {
   const storageReference = await ethers.provider.getStorageAt(contractAddress, paddedSlot);
 
   const baseSlot = utils.keccak256(paddedSlot);
-  const sLength = bytesLength(storageReference);
+  const sLength = BigNumber.from(storageReference).shr(1).toNumber();
   const totalSlots = Math.ceil(sLength / 32);
 
   let storageLocation = BigNumber.from(baseSlot).toHexString();
